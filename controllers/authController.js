@@ -115,12 +115,29 @@ exports.login = async (req, res) => {
         const token = jwt.sign({ id: results[0].id }, process.env.JWT_SECRET, {
           expiresIn: "1h",
         });
-
         res.json({ token, msg: "Logged in successfully" });
       }
     );
   } catch (error) {
     console.error("Server error during login:", error);
     res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// Get Current User
+exports.currentUser = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const sql =
+      "select id, first_name, last_name, full_name, email, role from users where id = ?";
+    db.query(sql, [userId], (err, results) => {
+      if (err) {
+        console.error("error", err);
+        throw err;
+      }
+      res.json(results[0]);
+    });
+  } catch (error) {
+    res.status(500).json({ msg: "server error" });
   }
 };
