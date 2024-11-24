@@ -14,6 +14,21 @@ const {
   getAllPatientDetails,
 } = require("../controllers/patientController");
 
+const {
+  assignCaregiver,
+  unassignCaregiver,
+  getAllCaregiver,
+  getAssignedList,
+  updateCareGiver,
+  getUnassignedList,
+} = require("../controllers/caregiverController");
+
+const {
+  scheduleAppointment,
+  updateScheduleAppointment,
+  getAllAppointment,
+} = require("../controllers/appointmentController");
+
 
 const router = express.Router();
 
@@ -31,6 +46,25 @@ router.delete("/patient/deletePatient", auth, deletePatient);
 router.get("/patient/getPatientDetails", auth, getPatientDetails);
 router.get("/patient/getAllPatientDetails", auth, getAllPatientDetails);
 
+// Caregiver API's
+router.put("/caregiver/updateCareGiver", auth, updateCareGiver);
+router.post("/caregiver/assignCaregiver", auth, assignCaregiver);
+router.delete("/caregiver/unassignCaregiver", auth, unassignCaregiver);
+router.get("/caregiver/getAllCaregiver", auth, getAllCaregiver);
+router.get(
+  "/caregiver/getAssignedList",
+  auth,
+  getAssignedList
+);
+router.get("/caregiver/getUnassignedList", auth, getUnassignedList);
 
+// Appointment API's
+router.post("/appointment/scheduleAppointment", auth, scheduleAppointment);
+router.put(
+  "/appointment/updateScheduleAppointment",
+  auth,
+  updateScheduleAppointment
+);
+router.get("/appointment/getAllAppointment", auth, getAllAppointment);
 
 module.exports = router;
