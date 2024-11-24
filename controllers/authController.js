@@ -8,25 +8,16 @@ dotenv.config();
 
 // Register User
 exports.register = async (req, res) => {
-  const { email, password, first_name, last_name, address, city, role } =
-    req.body;
-  console.log("req", req.body);
-  if (
-    !email ||
-    !password ||
-    !first_name ||
-    !last_name ||
-    !address ||
-    !city ||
-    !role
-  ) {
+  const { email, password, first_name, last_name, role } = req.body;
+
+  if (!email || !password || !first_name || !last_name || !role) {
     return res.status(400).json({ msg: "Please fill all fields" });
   }
 
   try {
-    // Check if the email or username is already in use
+    // Check if the email is already in use
     db.query(
-      "SELECT * FROM users WHERE email = ?",
+      "select * from users where email = ?",
       [email],
       async (error, results) => {
         if (results.length > 0) {
@@ -38,7 +29,7 @@ exports.register = async (req, res) => {
 
         // Save the user in the database
         db.query(
-          "INSERT INTO users SET ?",
+          "insert into users set ?",
           {
             email,
             user_name: email,
@@ -46,13 +37,43 @@ exports.register = async (req, res) => {
             first_name,
             last_name,
             full_name: `${first_name + " " + last_name}`,
-            address,
-            city,
             role,
           },
           (err, result) => {
-            if (err) throw err;
-            res.status(201).json({ msg: "User registered successfully" });
+            if (err) {
+              console.error(err);
+              return res.status(500).json({ msg: "Server error" });
+            }
+
+            // User successfully registered
+            const userId = result.insertId; // Get the inserted user ID
+
+            // Check if the role_id is 2 and create a caregiver
+            if (role === 2) {
+              const caregiverName = `${first_name} ${last_name}`;
+              const caregiverSql =
+                "insert into caregivers (user_id, name, availability) values (?, ?, true)";
+              db.query(
+                caregiverSql,
+                [userId, caregiverName],
+                (caregiverErr) => {
+                  if (caregiverErr) {
+                    console.error("Error creating caregiver:", caregiverErr);
+                    return res.status(500).json({
+                      msg: "User registered but failed to create caregiver",
+                    });
+                  }
+
+                  return res.status(201).json({
+                    msg: "User and caregiver registered successfully",
+                  });
+                }
+              );
+            } else {
+              return res
+                .status(201)
+                .json({ msg: "User registered successfully" });
+            }
           }
         );
       }
