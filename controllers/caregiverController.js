@@ -68,7 +68,6 @@ exports.unassignCaregiver = async (req, res) => {
 // Get Caregiver
 exports.getAllCaregiver = async (req, res) => {
   const userId = req.user.id;
-  console.log("userId", userId);
   const sql = "select * from caregivers where user_id = ?";
   db.query(sql, [userId], (err, results) => {
     if (err) {

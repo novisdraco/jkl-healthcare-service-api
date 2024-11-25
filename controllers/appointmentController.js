@@ -112,7 +112,9 @@ exports.getAllAppointment = async (req, res) => {
         p.email,
         p.medical_record,
         a.notification_sent,
-        a.appointment_id
+        a.appointment_id,
+        a.appointment_date,
+        a.notification_sent
     from 
         caregiver_assignments ca
     join 
